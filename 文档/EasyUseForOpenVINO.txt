@@ -1,0 +1,44 @@
+====get tensorflow-yolo-v3====
+
+git clone https://github.com/mystic123/tensorflow-yolo-v3.git
+
+use replace function to replace FILE_PATH to your path of the folder "tensorflow-yolo-v3" in this txt below(e.g. Mine is E:/chLi/tensorflow-yolo-v3)
+
+====install OpenVINO====
+
+install 英特尔分布式OpenVINO工具包
+install 带有Visual Studio C ++的Microsoft Visual Studio(VS2015/VS2017/VS2019)
+install CMake(>=3.4)
+install Python(better for 3.6)
+
+open cmd
+
+"C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/model_optimizer/install_prerequisites/install_prerequisites.bat"
+"C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/demo/demo_squeezenet_download_convert_run.bat"
+"C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/demo/demo_benchmark_app.bat"
+"C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/demo/demo_security_barrier_camera.bat"
+
+====trans yolo model to tf model====
+
+open cmd
+
+cp 'yolov3.weights' and 'coco.names' to FILE_PATH
+
+cd FILE_PATH
+python convert_weights_pb.py
+
+====trans tf model to mo model====
+
+open cmd(管理员)
+
+cd FILE_PATH
+python "C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/model_optimizer/mo.py" --input_model "FILE_PATH/frozen_darknet_yolov3_model.pb" -b 1 --tensorflow_use_custom_operations_config "C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/model_optimizer/extensions/front/tf/yolo_v3.json"
+
+====test OpenVINO model====
+
+cp '2019_5000m.mp4' to FILE_PATH
+
+open cmd
+
+"C:/Program Files (x86)/IntelSWTools/openvino/bin/setupvars.bat"
+python "C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/inference_engine/demos/python_demos/object_detection_demo_yolov3_async/object_detection_demo_yolov3_async.py" –-labels "FILE_PATH/coco.names" -i "FILE_PATH/2019_5000m.mp4" -m "FILE_PATH/frozen_darknet_yolov3_model.xml" -d CPU –-cpu_extension "C:/Program Files (x86)/IntelSWTools/openvino/deployment_tools/inference_engine/bin/intel64/Release/cpu_extension_avx2.dll"
